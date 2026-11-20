@@ -3,46 +3,38 @@ import 'package:material_ui/material_ui.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 
+import 'podaci/upravitelj_baze.dart';
+
 Future<void> main() async {
+  // Flutter mora biti spreman prije nego koristimo pluginove (bazu, assets)
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 1) Odabir "motora": u Chromeu SQLite kroz WebAssembly, na Androidu nativni SQLite
+  // U Chromeu koristimo SQLite preveden u WebAssembly, na mobitelu pravi SQLite
   if (kIsWeb) {
     databaseFactory = databaseFactoryFfiWeb;
   }
 
-  // 2) Otvaranje (i po potrebi kreiranje) baze
-  final db = await openDatabase(
-    'test.db',
-    version: 1,
-    onCreate: (db, version) async {
-      // izvršava se SAMO kad baza još ne postoji
-      await db.execute('''
-        CREATE TABLE categories(
-          category_id   INTEGER PRIMARY KEY AUTOINCREMENT,
-          category_name TEXT NOT NULL,
-          color         TEXT NOT NULL
-        )
-      ''');
-    },
-  );
+  // PRIVREMENI TEST: otvori bazu i prebroji retke u obje tablice
+  Database baza = await UpraviteljBaze.instanca.baza;
+  List<Map<String, Object?>> kategorije = await baza.query('kategorija');
+  List<Map<String, Object?>> zadaci = await baza.query('zadatak');
 
-  // 3) Upis jednog retka
-  await db.insert('categories', {'category_name': 'RAMPU', 'color': '#000080'});
-
-  // 4) Selekcija svih redaka
-  final rows = await db.query('categories');
-  print('Broj redaka: ${rows.length}');
-  print(rows);
-
-  runApp(MyApp(brojRedaka: rows.length));   
+  runApp(MyApp(
+    brojKategorija: kategorije.length,
+    brojZadataka: zadaci.length,
+  ));
 }
 
-
+// PRIVREMENI EKRAN: samo ispisuje dva broja
 class MyApp extends StatelessWidget {
-  final int brojRedaka;
+  final int brojKategorija;
+  final int brojZadataka;
 
-  const MyApp({super.key, required this.brojRedaka});
+  const MyApp({
+    super.key,
+    required this.brojKategorija,
+    required this.brojZadataka,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -52,8 +44,9 @@ class MyApp extends StatelessWidget {
         appBar: AppBar(title: const Text('Test baze')),
         body: Center(
           child: Text(
-            'U tablici categories ima $brojRedaka redaka',
-            style: const TextStyle(fontSize: 20),
+            'Kategorija: $brojKategorija\nZadataka: $brojZadataka',
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 22),
           ),
         ),
       ),
