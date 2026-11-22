@@ -6,7 +6,7 @@ import '../podaci/kategorija_dao.dart';
 import '../podaci/podzadatak_dao.dart';
 import '../podaci/zadatak_dao.dart';
 import 'pohrana_ekran.dart';
-// ================= EKRAN S LISTOM ZADATAKA =================
+// EKRAN S LISTOM ZADATAKA
 
 class BazaEkran extends StatefulWidget {
   const BazaEkran({super.key});
@@ -159,7 +159,7 @@ class _BazaEkranState extends State<BazaEkran> {
   }
 }
 
-// ================= PROZOR ZA NOVI ZADATAK =================
+// PROZOR  ZA NOVI ZADATAK
 
 class NoviZadatakDijalog extends StatefulWidget {
   final List<Kategorija> kategorije;

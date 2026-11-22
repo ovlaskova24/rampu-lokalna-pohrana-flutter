@@ -27,18 +27,18 @@ class UpraviteljBaze {
       _nazivBaze,
       version: _verzija,
 
-      // Poziva se pri SVAKOM otvaranju, uključuje provjeru stranih ključeva
+      // Poziva se pri svakom otvaranju, uključuje provjeru stranih ključeva
       onConfigure: (db) async {
         await db.execute('PRAGMA foreign_keys = ON');
       },
 
-      // Baza NE postoji (nova instalacija), izvrši sve skripte redom
+      // Baza ne postoji (nova instalacija), izvrši sve skripte redom
       onCreate: (db, verzija) async {
         await _izvrsiSkriptu(db, 'assets/sql/kreirajBazu.sql');
         await _izvrsiSkriptu(db, 'assets/sql/azurirajBazu_v2.sql');
       },
 
-      // Baza POSTOJI, ali je starija verzija, izvrši samo ono što nedostaje
+      // Baza postoji, ali je starija verzija, izvrši samo ono što nedostaje
       onUpgrade: (db, staraVerzija, novaVerzija) async {
         print('Nadogradnja baze s verzije $staraVerzija na $novaVerzija');
 
@@ -51,13 +51,13 @@ class UpraviteljBaze {
 
   // Čita .sql datoteku iz assets i izvršava naredbu po naredbu
   Future<void> _izvrsiSkriptu(Database db, String putanja) async {
-    // 1) Učitaj cijelu .sql datoteku kao jedan tekst
+    // 1 Učitaj cijelu .sql datoteku kao jedan tekst
     String sadrzaj = await rootBundle.loadString(putanja);
 
-    // 2) Razreži tekst na dijelove – svaka SQL naredba završava s ;
+    // 2Razreži tekst na dijelove – svaka SQL naredba završava s ;
     List<String> dijelovi = sadrzaj.split(';');
 
-    // 3) Izvrši svaku naredbu posebno
+    // 3 Izvrši svaku naredbu posebno
     for (String dio in dijelovi) {
       String naredba = dio.trim(); // makni razmake i prazne retke
 
