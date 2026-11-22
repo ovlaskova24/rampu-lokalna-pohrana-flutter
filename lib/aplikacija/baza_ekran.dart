@@ -5,6 +5,7 @@ import '../interface/zadatak.dart';
 import '../podaci/kategorija_dao.dart';
 import '../podaci/podzadatak_dao.dart';
 import '../podaci/zadatak_dao.dart';
+import 'pohrana_ekran.dart';
 // ================= EKRAN S LISTOM ZADATAKA =================
 
 class BazaEkran extends StatefulWidget {
@@ -107,7 +108,20 @@ class _BazaEkranState extends State<BazaEkran> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Zadaci')),
+      appBar: AppBar(
+        title: const Text('Zadaci'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.folder),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const PohranaEkran()),
+              );
+            },
+          ),
+        ],
+      ),
       body: ListView.builder(
         itemCount: zadaci.length,
         itemBuilder: (context, i) {

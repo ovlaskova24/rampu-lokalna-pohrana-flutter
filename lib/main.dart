@@ -4,13 +4,19 @@ import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 
 import 'aplikacija/baza_ekran.dart';
+import 'pohrana/postavke.dart';
 
 Future<void> main() async {
+  // Flutter mora biti spreman prije nego koristimo pluginove (bazu, datoteke, postavke)
   WidgetsFlutterBinding.ensureInitialized();
 
+  // U Chromeu koristimo SQLite preveden u WebAssembly, na mobitelu pravi SQLite
   if (kIsWeb) {
     databaseFactory = databaseFactoryFfiWeb;
   }
+
+  // SharedPreferences: brojimo koliko je puta aplikacija pokrenuta
+  await Postavke().povecajBrojPokretanja();
 
   runApp(const MyApp());
 }
