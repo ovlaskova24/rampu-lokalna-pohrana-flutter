@@ -1,6 +1,6 @@
 # Lokalna pohrana podataka u Flutteru
 
-Demo projekt za seminar iz kolegija **Razvoj aplikacija za mobilne i pametne uređaje (RAMPU)**, FOI 2026./2027.
+Demo projekt za seminar iz kolegija **Razvoj aplikacija za mobilne i pametne uređaje**
 
 Autor: Oliver Vlaškovac
 
