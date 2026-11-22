@@ -3,8 +3,8 @@ import 'package:material_ui/material_ui.dart';
 import '../interface/kategorija.dart';
 import '../interface/zadatak.dart';
 import '../podaci/kategorija_dao.dart';
+import '../podaci/podzadatak_dao.dart';
 import '../podaci/zadatak_dao.dart';
-
 // ================= EKRAN S LISTOM ZADATAKA =================
 
 class BazaEkran extends StatefulWidget {
@@ -17,6 +17,7 @@ class BazaEkran extends StatefulWidget {
 class _BazaEkranState extends State<BazaEkran> {
   var zadatakDAO = ZadatakDAO();
   var kategorijaDAO = KategorijaDAO();
+  var podzadatakDAO = PodzadatakDAO();
 
   List<Zadatak> zadaci = [];
 
@@ -27,7 +28,7 @@ class _BazaEkranState extends State<BazaEkran> {
     ucitajZadatke();
   }
 
-  // >>> DAO: SELECT s INNER JOIN-om
+  // >>> DAO: SELECT s INNER JOIN-om (zadatak + kategorija)
   Future<void> ucitajZadatke() async {
     var rezultat = await zadatakDAO.dohvatiSKategorijom();
     setState(() {
@@ -41,10 +42,42 @@ class _BazaEkranState extends State<BazaEkran> {
     await ucitajZadatke();
   }
 
-  // >>> DAO: DELETE
+  // >>> DAO: DELETE (podzadaci se brišu sami – ON DELETE CASCADE)
   Future<void> obrisiZadatak(Zadatak zadatak) async {
     await zadatakDAO.obrisi(zadatak.id!);
     await ucitajZadatke();
+  }
+
+  // >>> DAO: NATURAL JOIN (zadatak + podzadatak)
+  Future<void> prikaziPodzadatke(Zadatak zadatak) async {
+    var podzadaci = await podzadatakDAO.dohvatiZaZadatak(zadatak.id!);
+    if (!mounted) return;
+
+    List<Widget> redovi = [];
+    for (var podzadatak in podzadaci) {
+      redovi.add(Text('${podzadatak.redniBroj}. ${podzadatak.opis}'));
+    }
+    if (redovi.isEmpty) {
+      redovi.add(const Text('Nema podzadataka.'));
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(zadatak.naslov),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: redovi,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Zatvori'),
+          ),
+        ],
+      ),
+    );
   }
 
   // Otvara prozor za novi zadatak (INSERT se radi u prozoru)
@@ -81,6 +114,9 @@ class _BazaEkranState extends State<BazaEkran> {
           var zadatak = zadaci[i];
 
           return ListTile(
+            onTap: () {
+              prikaziPodzadatke(zadatak);
+            },
             leading: Checkbox(
               value: zadatak.zavrsen,
               onChanged: (vrijednost) {
